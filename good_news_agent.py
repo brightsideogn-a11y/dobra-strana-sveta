@@ -13,6 +13,24 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 import random
 
+# Returns True if the image URL is a known bad placeholder (Google logo, etc.)
+def is_bad_image_url(url):
+    if not url:
+        return True
+    bad_patterns = [
+        "google.com/images/branding",
+        "gstatic.com/images",
+        "googlelogo",
+        "lh3.googleusercontent.com/proxy",
+        "news.google.com/api",
+        "1x1.gif",
+        "blank.gif",
+        "data:image",
+        "favicon",
+    ]
+    url_lower = url.lower()
+    return any(p in url_lower for p in bad_patterns)
+
 # CONFIGURATION
 RSS_SOURCES = [
   # --- English / Western ---
@@ -288,6 +306,12 @@ def save_stories_to_firestore(new_stories):
         if exists:
             print(f"Story already exists in Firestore: {title}. Skipping.")
             continue
+
+        # Filter out bad image URLs (Google logos, placeholders, etc.)
+        raw_image = s.get("image") or ""
+        clean_image = "" if is_bad_image_url(raw_image) else raw_image
+        if raw_image and not clean_image:
+            print(f"  Filtered bad image URL for: {title}")
             
         doc_data = {
             "title": title,
@@ -295,7 +319,7 @@ def save_stories_to_firestore(new_stories):
             "content": s.get("content", ""),
             "author": s.get("author", "Scraper"),
             "link": link or "",
-            "image": s.get("image") or "",
+            "image": clean_image,
             "date": s.get("date") or datetime.now().strftime("%d %b %Y"),
             "timestamp": int(datetime.now().timestamp() * 1000),
             "likes": 0,

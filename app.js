@@ -952,10 +952,13 @@ function isBadImageUrl(url) {
     "google.com/images/branding",
     "gstatic.com/images",
     "googlelogo",
+    "lh3.googleusercontent.com/proxy",
+    "news.google.com/api",
     "1x1.gif",
     "blank.gif",
     "placeholder",
-    "data:image"
+    "data:image",
+    "favicon"
   ];
   return badPatterns.some(p => url.toLowerCase().includes(p));
 }
