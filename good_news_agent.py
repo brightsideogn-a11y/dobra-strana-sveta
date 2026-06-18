@@ -15,6 +15,7 @@ import random
 
 # CONFIGURATION
 RSS_SOURCES = [
+  # --- English / Western ---
   {"name": "Good News Network", "url": "https://www.goodnewsnetwork.org/feed/"},
   {"name": "Positive News", "url": "https://www.positive.news/feed/"},
   {"name": "The Optimist Daily", "url": "https://www.optimistdaily.com/feed/"},
@@ -22,7 +23,27 @@ RSS_SOURCES = [
   {"name": "Yes! Magazine", "url": "https://www.yesmagazine.org/feed/"},
   {"name": "The Guardian - The Upside", "url": "https://www.theguardian.com/world/series/the-upside/rss"},
   {"name": "NASA Breaking News", "url": "https://www.nasa.gov/feed/"},
-  {"name": "Google News - Uplifting", "url": "https://news.google.com/rss/search?q=uplifting+news+OR+good+news+OR+positive+news&hl=en-US&gl=US&ceid=US:en"}
+  {"name": "Google News - Uplifting", "url": "https://news.google.com/rss/search?q=uplifting+news+OR+good+news+OR+positive+news&hl=en-US&gl=US&ceid=US:en"},
+
+  # --- Asia / China ---
+  {"name": "CGTN World", "url": "https://www.cgtn.com/subscribe/rss/section/world.xml"},
+  {"name": "Xinhua English", "url": "https://english.news.cn/home/index.htm"},
+  {"name": "The Straits Times Asia", "url": "https://www.straitstimes.com/news/asia/rss.xml"},
+  {"name": "Google News - Asia Uplifting", "url": "https://news.google.com/rss/search?q=positive+news+Asia+OR+China+OR+India&hl=en-US&gl=US&ceid=US:en"},
+
+  # --- Africa ---
+  {"name": "Good Things Guy", "url": "https://goodthingsguy.com/feed/"},
+  {"name": "AllAfrica", "url": "https://allafrica.com/tools/headlines/rdf/latest/headlines.rdf"},
+  {"name": "The Africa Report", "url": "https://www.theafricareport.com/feed/"},
+  {"name": "Google News - Africa Positive", "url": "https://news.google.com/rss/search?q=positive+news+Africa+OR+innovation+Africa&hl=en-US&gl=US&ceid=US:en"},
+
+  # --- Middle East ---
+  {"name": "Al Jazeera English", "url": "https://www.aljazeera.com/xml/rss/all.xml"},
+  {"name": "Google News - Middle East Hope", "url": "https://news.google.com/rss/search?q=positive+news+Middle+East+OR+Arab+world+innovation&hl=en-US&gl=US&ceid=US:en"},
+
+  # --- Latin America ---
+  {"name": "Google News - Latin America Positive", "url": "https://news.google.com/rss/search?q=buenas+noticias+OR+positive+news+Latin+America&hl=en-US&gl=US&ceid=US:en"},
+  {"name": "Google News - Brasil Positive", "url": "https://news.google.com/rss/search?q=boas+noticias+OR+inovacao+Brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419"},
 ]
 STORIES_FILE = "stories.json"
 MAX_STORIES = 40
