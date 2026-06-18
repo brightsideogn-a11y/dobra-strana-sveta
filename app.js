@@ -256,7 +256,7 @@ function renderStories() {
     const isLiked = likedStories.includes(story.id);
     const badgeClass = `badge-${story.category}`;
     const categoryName = getCategoryName(story.category);
-    const imageUrl = story.image || getCategoryPlaceholder(story.category);
+    const imageUrl = (!story.image || isBadImageUrl(story.image)) ? getCategoryPlaceholder(story.category, story.id) : story.image;
     
     return `
       <article class="news-card glass-panel fade-in-on-scroll" data-id="${story.id}">
@@ -733,7 +733,7 @@ function renderPendingStories(pendingStories) {
   pendingGrid.innerHTML = pendingStories.map(story => {
     const badgeClass = `badge-${story.category}`;
     const categoryName = getCategoryName(story.category);
-    const imageUrl = story.image || getCategoryPlaceholder(story.category);
+    const imageUrl = (!story.image || isBadImageUrl(story.image)) ? getCategoryPlaceholder(story.category, story.id) : story.image;
     
     return `
       <div class="pending-card glass-panel" data-id="${story.id}" style="padding: 16px; display: flex; flex-direction: column; gap: 12px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
@@ -896,16 +896,70 @@ function clearFormErrors() {
 }
 
 // 14. DETAILED STORY MODAL LOGIC & IMAGE FALLBACKS
-function getCategoryPlaceholder(category) {
+function getCategoryPlaceholder(category, seed) {
   const placeholders = {
-    nature: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&auto=format&fit=crop&q=80",
-    science: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80",
-    humanity: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&auto=format&fit=crop&q=80",
-    kindness: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=600&auto=format&fit=crop&q=80",
-    culture: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&auto=format&fit=crop&q=80"
+    nature: [
+      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=600&auto=format&fit=crop&q=80"
+    ],
+    science: [
+      "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1564325724739-bae0bd08762c?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1614728263952-84ea256f9d1d?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop&q=80"
+    ],
+    humanity: [
+      "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1527525443983-6e60c75fff46?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1542810634-71277d95dcbb?w=600&auto=format&fit=crop&q=80"
+    ],
+    kindness: [
+      "https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1538300342682-cf57afb97285?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1608555855762-2b657eb1c348?w=600&auto=format&fit=crop&q=80"
+    ],
+    culture: [
+      "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1499781350541-7783f6c6a0c8?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=600&auto=format&fit=crop&q=80"
+    ]
   };
-  return placeholders[category] || placeholders.kindness;
+  const pool = placeholders[category] || placeholders.kindness;
+  // Use seed (story id) to pick consistently but vary across stories
+  const idx = seed ? Math.abs(seed.split('').reduce((a, c) => a + c.charCodeAt(0), 0)) % pool.length : 0;
+  return pool[idx];
 }
+
+// Returns true if the image URL is a known bad/placeholder URL (e.g. Google logo)
+function isBadImageUrl(url) {
+  if (!url) return true;
+  const badPatterns = [
+    "google.com/images/branding",
+    "gstatic.com/images",
+    "googlelogo",
+    "1x1.gif",
+    "blank.gif",
+    "placeholder",
+    "data:image"
+  ];
+  return badPatterns.some(p => url.toLowerCase().includes(p));
+}
+
 
 function openStoryDetail(storyId) {
   const story = stories.find(s => s.id === storyId);
@@ -930,7 +984,7 @@ function openStoryDetail(storyId) {
   }
 
   if (imgElem) {
-    imgElem.src = story.image || getCategoryPlaceholder(story.category);
+    imgElem.src = (!story.image || isBadImageUrl(story.image)) ? getCategoryPlaceholder(story.category, story.id) : story.image;
     imgElem.alt = story.title;
   }
 
@@ -1011,7 +1065,7 @@ function initFeaturedSlider() {
     // Fade out effect
     imgElem.style.opacity = '0.3';
     setTimeout(() => {
-      imgElem.src = story.image || getCategoryPlaceholder(story.category);
+      imgElem.src = (!story.image || isBadImageUrl(story.image)) ? getCategoryPlaceholder(story.category, story.id) : story.image;
       imgElem.alt = story.title;
       imgElem.style.opacity = '1';
     }, 200);
