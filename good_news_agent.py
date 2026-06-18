@@ -15,7 +15,12 @@ from firebase_admin import firestore
 # CONFIGURATION
 RSS_SOURCES = [
   {"name": "Good News Network", "url": "https://www.goodnewsnetwork.org/feed/"},
-  {"name": "Positive News", "url": "https://www.positive.news/feed/"}
+  {"name": "Positive News", "url": "https://www.positive.news/feed/"},
+  {"name": "The Optimist Daily", "url": "https://www.optimistdaily.com/feed/"},
+  {"name": "Reasons to be Cheerful", "url": "https://reasonstobecheerful.world/feed/"},
+  {"name": "Yes! Magazine", "url": "https://www.yesmagazine.org/feed/"},
+  {"name": "Good News Shared", "url": "https://goodnewsshared.com/feed/"},
+  {"name": "The Guardian - The Upside", "url": "https://www.theguardian.com/world/series/the-upside/rss"}
 ]
 STORIES_FILE = "stories.json"
 MAX_STORIES = 40
