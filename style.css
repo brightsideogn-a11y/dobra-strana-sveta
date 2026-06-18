@@ -1,0 +1,1445 @@
+/* ==========================================================================
+   DIZAJN SISTEM & VARIJABLE (Dobra Strana Sveta)
+   ========================================================================== */
+
+:root {
+  /* Svetla tema (Default) */
+  --bg-primary-grad: linear-gradient(135deg, #fefbf6 0%, #f0f7f6 100%);
+  --bg-glow-1: rgba(254, 215, 170, 0.4); /* Narandžasta */
+  --bg-glow-2: rgba(153, 246, 228, 0.4); /* Tirkizna */
+  --bg-glow-3: rgba(191, 219, 254, 0.3); /* Plava */
+
+  --panel-bg: rgba(255, 255, 255, 0.45);
+  --panel-border: rgba(255, 255, 255, 0.6);
+  --panel-shadow: 0 8px 32px 0 rgba(148, 163, 184, 0.08), 
+                  0 1px 1px 0 rgba(255, 255, 255, 0.8) inset;
+
+  --text-primary: #1e293b;   /* Slate 800 */
+  --text-secondary: #475569; /* Slate 600 */
+  --text-muted: #64748b;     /* Slate 500 */
+  --text-light: #ffffff;
+
+  --accent-orange: #ea580c;  /* Amber 700 */
+  --accent-teal: #0d9488;    /* Teal 600 */
+  --accent-teal-hover: #0f766e;
+  --accent-heart: #ef4444;    /* Crvena */
+
+  --badge-bg-humanity: rgba(239, 68, 68, 0.1);
+  --badge-text-humanity: #dc2626;
+  --badge-bg-science: rgba(59, 130, 246, 0.1);
+  --badge-text-science: #2563eb;
+  --badge-bg-nature: rgba(16, 185, 129, 0.1);
+  --badge-text-nature: #059669;
+  --badge-bg-kindness: rgba(245, 158, 11, 0.1);
+  --badge-text-kindness: #d97706;
+  --badge-bg-culture: rgba(139, 92, 246, 0.1);
+  --badge-text-culture: #7c3aed;
+
+  --input-bg: rgba(255, 255, 255, 0.6);
+  --input-border: rgba(148, 163, 184, 0.2);
+  --input-focus-border: var(--accent-teal);
+
+  --scrollbar-track: rgba(241, 245, 249, 0.5);
+  --scrollbar-thumb: rgba(148, 163, 184, 0.4);
+
+  --card-border-hover: rgba(255, 255, 255, 0.8);
+  --modal-overlay-bg: rgba(15, 23, 42, 0.3);
+
+  /* Fontovi */
+  --font-family-title: 'Outfit', sans-serif;
+  --font-family-body: 'Inter', sans-serif;
+
+  color-scheme: light dark;
+}
+
+/* Override-ovi za tamnu temu */
+.dark-mode {
+  --bg-primary-grad: linear-gradient(135deg, #090e1a 0%, #0c182d 100%);
+  --bg-glow-1: rgba(234, 88, 12, 0.15);
+  --bg-glow-2: rgba(13, 148, 136, 0.15);
+  --bg-glow-3: rgba(29, 78, 216, 0.1);
+
+  --panel-bg: rgba(15, 23, 42, 0.45);
+  --panel-border: rgba(255, 255, 255, 0.05);
+  --panel-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), 
+                  0 1px 1px 0 rgba(255, 255, 255, 0.05) inset;
+
+  --text-primary: #f1f5f9;   /* Slate 100 */
+  --text-secondary: #cbd5e1; /* Slate 300 */
+  --text-muted: #94a3b8;     /* Slate 400 */
+
+  --accent-orange: #f97316;
+  --accent-teal: #2dd4bf;    /* Teal 400 */
+  --accent-teal-hover: #14b8a6;
+
+  --badge-bg-humanity: rgba(239, 68, 68, 0.2);
+  --badge-text-humanity: #fca5a5;
+  --badge-bg-science: rgba(59, 130, 246, 0.2);
+  --badge-text-science: #93c5fd;
+  --badge-bg-nature: rgba(16, 185, 129, 0.2);
+  --badge-text-nature: #6ee7b7;
+  --badge-bg-kindness: rgba(245, 158, 11, 0.2);
+  --badge-text-kindness: #fcd34d;
+  --badge-bg-culture: rgba(139, 92, 246, 0.2);
+  --badge-text-culture: #c4b5fd;
+
+  --input-bg: rgba(15, 23, 42, 0.6);
+  --input-border: rgba(255, 255, 255, 0.1);
+
+  --scrollbar-track: rgba(15, 23, 42, 0.5);
+  --scrollbar-thumb: rgba(148, 163, 184, 0.2);
+
+  --card-border-hover: rgba(255, 255, 255, 0.1);
+  --modal-overlay-bg: rgba(0, 0, 0, 0.6);
+}
+
+/* ==========================================================================
+   OSNOVNI I ZAJEDNIČKI STILOVI
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+body {
+  font-family: var(--font-family-body);
+  background: var(--bg-primary-grad);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Pozadinski svetleći elementi (Glow effect) */
+.bg-glow {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(100px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.bg-glow-1 {
+  width: 40vw;
+  height: 40vw;
+  background: var(--bg-glow-1);
+  top: -10vw;
+  right: -10vw;
+}
+
+.bg-glow-2 {
+  width: 45vw;
+  height: 45vw;
+  background: var(--bg-glow-2);
+  bottom: -15vw;
+  left: -10vw;
+}
+
+.bg-glow-3 {
+  width: 30vw;
+  height: 30vw;
+  background: var(--bg-glow-3);
+  top: 35vh;
+  left: 30vw;
+}
+
+/* Custom scrollbar za Chrome/Safari */
+@supports not (scrollbar-color: auto) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.6);
+  }
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Glassmorphism panel šablon */
+.glass-panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--panel-shadow);
+  border-radius: 16px;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), 
+              box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), 
+              border-color 0.3s ease;
+}
+
+/* ==========================================================================
+   DODATNI ELEMENTI I DUGMAD
+   ========================================================================== */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: var(--font-family-title);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  width: fit-content;
+}
+
+.badge-humanity { background: var(--badge-bg-humanity); color: var(--badge-text-humanity); }
+.badge-science { background: var(--badge-bg-science); color: var(--badge-text-science); }
+.badge-nature { background: var(--badge-bg-nature); color: var(--badge-text-nature); }
+.badge-kindness { background: var(--badge-bg-kindness); color: var(--badge-text-kindness); }
+.badge-culture { background: var(--badge-bg-culture); color: var(--badge-text-culture); }
+
+/* Tasteri */
+.primary-btn, .secondary-btn, .icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  font-family: var(--font-family-title);
+  font-weight: 600;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-teal-hover) 100%);
+  color: white;
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 14px 0 rgba(13, 148, 136, 0.2);
+}
+
+.primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px 0 rgba(13, 148, 136, 0.35);
+  filter: brightness(1.05);
+}
+
+.primary-btn:active {
+  transform: translateY(0);
+}
+
+.secondary-btn {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  color: var(--text-primary);
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  backdrop-filter: blur(8px);
+}
+
+.secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--text-muted);
+  transform: translateY(-1px);
+}
+
+.text-btn {
+  background: transparent;
+  border: none;
+  padding: 6px 12px;
+  color: var(--accent-teal);
+  font-size: 0.9rem;
+}
+
+.text-btn:hover {
+  background: rgba(13, 148, 136, 0.08);
+  transform: none;
+}
+
+.icon-btn {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: var(--text-primary);
+}
+
+.icon-btn:hover {
+  transform: scale(1.05);
+  border-color: var(--accent-teal);
+}
+
+.btn-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
+
+/* Gradient tekst */
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent-orange) 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ==========================================================================
+   ZAGLAVLJE (HEADER)
+   ========================================================================== */
+
+.main-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+}
+
+.dark-mode .main-header {
+  background: rgba(15, 23, 42, 0.25);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-logo {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.brand-text h1 {
+  font-family: var(--font-family-title);
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+.brand-text .tagline {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--accent-orange);
+  font-weight: 600;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Sun/Moon ikonice u zavisnosti od teme */
+#theme-toggle .sun-icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+#theme-toggle .moon-icon {
+  display: none;
+  width: 20px;
+  height: 20px;
+}
+
+.dark-mode #theme-toggle .sun-icon {
+  display: none;
+}
+
+.dark-mode #theme-toggle .moon-icon {
+  display: block;
+}
+
+/* ==========================================================================
+   GLAVNI SKLOP I HERO SEKCIJA
+   ========================================================================== */
+
+.main-content {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 40px 24px;
+  flex: 1;
+}
+
+/* Hero raspored */
+.hero-section {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 40px;
+  align-items: center;
+  margin-bottom: 50px;
+}
+
+.hero-text h2 {
+  font-family: var(--font-family-title);
+  font-size: 2.8rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  margin-bottom: 20px;
+}
+
+.hero-text p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+  max-width: 600px;
+}
+
+.stats-container {
+  display: flex;
+  gap: 32px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-number {
+  font-family: var(--font-family-title);
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--accent-teal);
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Hero Quote Callout (inline version inside hero-text) */
+.hero-quote-callout {
+  margin-top: 30px;
+  padding: 18px 22px;
+  border-left: 4px solid var(--accent-teal);
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 0 16px 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 600px;
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+}
+
+.hero-quote-callout p {
+  font-family: var(--font-family-body);
+  font-size: 1rem !important;
+  font-style: italic;
+  margin-bottom: 0 !important;
+  color: var(--text-secondary) !important;
+  line-height: 1.5;
+}
+
+.hero-quote-callout-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.hero-quote-callout cite {
+  font-family: var(--font-family-title);
+  font-style: normal;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--accent-teal);
+}
+
+.quote-refresh-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  border-radius: 50%;
+}
+
+.quote-refresh-btn:hover {
+  color: var(--accent-teal);
+  background: rgba(13, 148, 136, 0.1);
+  border-color: rgba(13, 148, 136, 0.2);
+  transform: scale(1.05);
+}
+
+.quote-refresh-btn svg {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.6s ease;
+}
+
+.quote-refresh-btn:hover svg {
+  transform: rotate(180deg);
+}
+
+/* Featured Story Slider Card */
+.featured-slider-container {
+  height: 420px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border-radius: 24px;
+  box-shadow: var(--shadow-medium);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.featured-slider-container:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-large);
+}
+
+.slider-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.slide-active-img-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.featured-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.5s ease-in-out;
+  opacity: 1;
+}
+
+.img-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 10%, rgba(0, 0, 0, 0.45) 50%, rgba(0, 0, 0, 0.9) 100%);
+  pointer-events: none;
+}
+
+.slider-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 26px;
+  z-index: 2;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.slider-meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.slide-date {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.slide-title {
+  font-family: var(--font-family-title);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.35;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.slide-desc {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.5;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.slider-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.sm-btn {
+  padding: 8px 18px;
+  font-size: 0.85rem;
+  border-radius: 10px;
+}
+
+.slider-navigation {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-arrow {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-arrow:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.08);
+}
+
+.nav-arrow:active {
+  transform: scale(0.95);
+}
+
+.nav-arrow svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ==========================================================================
+   KONTROLE, FILTERI I PRETRAGA
+   ========================================================================== */
+
+.controls-section {
+  padding: 20px;
+  margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Pretraga */
+.search-box {
+  position: relative;
+  width: 100%;
+}
+
+.search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  color: var(--text-muted);
+}
+
+.search-box input {
+  width: 100%;
+  padding: 14px 16px 14px 48px;
+  font-family: var(--font-family-body);
+  font-size: 1rem;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--text-primary);
+  border-radius: 12px;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.search-box input:focus {
+  border-color: var(--input-focus-border);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.15);
+}
+
+.dark-mode .search-box input:focus {
+  background: rgba(15, 23, 42, 0.9);
+}
+
+/* Filteri */
+.categories-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-btn {
+  font-family: var(--font-family-title);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 8px 16px;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  color: var(--text-secondary);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.dark-mode .filter-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.filter-btn.active {
+  background: var(--text-primary);
+  color: var(--text-light);
+  border-color: var(--text-primary);
+}
+
+.dark-mode .filter-btn.active {
+  background: var(--text-primary);
+  color: #000;
+  border-color: var(--text-primary);
+}
+
+/* ==========================================================================
+   GRID SA KARTICAMA VESTI & KARTICE
+   ========================================================================== */
+
+.news-feed-section {
+  min-height: 300px;
+}
+
+.feed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.feed-header h3 {
+  font-family: var(--font-family-title);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.feed-count {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Grid raspored */
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
+}
+
+/* Individualna kartica vesti */
+.news-card {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 250px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.card-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  background: rgba(148, 163, 184, 0.05);
+  border: 1px solid var(--panel-border);
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.news-card:hover .card-image {
+  transform: scale(1.06);
+}
+
+.news-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px 0 rgba(148, 163, 184, 0.15);
+  border-color: var(--card-border-hover);
+}
+
+.card-top {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.card-title {
+  font-family: var(--font-family-title);
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--text-primary);
+}
+
+.card-content {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  margin-top: auto;
+}
+
+.card-author {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Lajkovanje (upvote) taster */
+.like-btn {
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.1);
+  padding: 6px 12px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent-heart);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.like-btn:hover {
+  background: rgba(239, 68, 68, 0.12);
+  transform: scale(1.03);
+}
+
+.like-btn.liked {
+  background: var(--accent-heart);
+  border-color: var(--accent-heart);
+  color: white;
+}
+
+.like-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.like-btn.liked svg {
+  fill: currentColor;
+  transform: scale(1.1);
+}
+
+/* Eksterni link */
+.link-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.link-btn:hover {
+  color: var(--accent-teal);
+  border-color: var(--accent-teal);
+}
+
+.link-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.empty-icon-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.empty-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--text-muted);
+}
+
+.empty-state h4 {
+  font-family: var(--font-family-title);
+  font-size: 1.25rem;
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+  max-width: 350px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ==========================================================================
+   SCROLL-DRIVEN ENTRY/EXIT ANIMATIONS (NATIVE & FALLBACK)
+   ========================================================================== */
+
+/* Podrška za redukovano kretanje: isključujemo animacije */
+@media (prefers-reduced-motion: no-preference) {
+  /* Provera pune CSS podrške za scroll-driven animacije */
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    @keyframes entry-fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .news-grid > article {
+      animation: entry-fade-in auto linear backwards;
+      animation-timeline: view();
+      animation-range: entry 5% entry 40%;
+    }
+  }
+
+  /* Klasa koju dodaje IntersectionObserver fallback za browsere bez podrške (npr. Firefox) */
+  .fade-in-on-scroll {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .fade-in-on-scroll.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ==========================================================================
+   MODAL ZA DODAVANJE VESTI (FORMULAR)
+   ========================================================================== */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  background: var(--modal-overlay-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 550px;
+  padding: 32px;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: scale(0.9);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-overlay.active .modal-card {
+  transform: scale(1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.modal-title {
+  font-family: var(--font-family-title);
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: rgba(148, 163, 184, 0.1);
+  color: var(--text-primary);
+}
+
+.close-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Formular */
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+label {
+  font-family: var(--font-family-title);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+label .required {
+  color: var(--accent-heart);
+}
+
+input[type="text"],
+input[type="url"],
+select,
+textarea {
+  width: 100%;
+  padding: 12px 16px;
+  font-family: var(--font-family-body);
+  font-size: 0.95rem;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--text-primary);
+  border-radius: 10px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--input-focus-border);
+  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.dark-mode input:focus,
+.dark-mode select:focus,
+.dark-mode textarea:focus {
+  background: rgba(15, 23, 42, 0.85);
+}
+
+/* Prilagođavanje select menija */
+.select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.select-wrapper select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  padding-right: 40px;
+}
+
+.select-arrow {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Greške pri validaciji */
+.error-msg {
+  display: none;
+  font-size: 0.8rem;
+  color: var(--accent-heart);
+  font-weight: 500;
+}
+
+.form-group.invalid input,
+.form-group.invalid textarea {
+  border-color: var(--accent-heart);
+  background: rgba(239, 68, 68, 0.02);
+}
+
+.form-group.invalid .error-msg {
+  display: block;
+}
+
+.form-info-note {
+  margin-top: 4px;
+  padding: 12px 16px;
+  background: rgba(13, 148, 136, 0.04);
+  border: 1px dashed rgba(13, 148, 136, 0.2);
+  border-radius: 12px;
+}
+
+.form-info-note p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.form-info-note a {
+  color: var(--accent-teal);
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+.form-info-note a:hover {
+  text-decoration: underline;
+  opacity: 0.9;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  padding-top: 20px;
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+
+.main-footer {
+  margin-top: auto;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+}
+
+.dark-mode .main-footer {
+  background: rgba(15, 23, 42, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-family-title);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.logo-emoji {
+  font-size: 1.2rem;
+}
+
+.footer-copy {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   MEDIJALNI UPITI (RESPONZIVNOST)
+   ========================================================================== */
+
+@media (max-width: 992px) {
+  .hero-section {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .hero-text h2 {
+    font-size: 2.3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 24px 16px;
+  }
+  
+  .hero-text h2 {
+    font-size: 1.9rem;
+  }
+
+  .hero-text p {
+    font-size: 1rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .form-row .form-group {
+    margin-bottom: 0;
+  }
+
+  .news-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .controls-section {
+    padding: 16px;
+  }
+
+  .categories-filter {
+    gap: 6px;
+  }
+
+  .filter-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+}
+
+/* ==========================================================================
+   STORY DETAIL VIEW SPECIFIC STYLES
+   ========================================================================== */
+
+.detail-modal-card {
+  max-width: 650px;
+}
+
+.detail-image-wrapper {
+  width: 100%;
+  height: 280px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  background: rgba(148, 163, 184, 0.05);
+  border: 1px solid var(--panel-border);
+}
+
+.detail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.detail-title {
+  font-family: var(--font-family-title);
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1.3;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.detail-date {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 20px;
+}
+
+.detail-body {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin-bottom: 30px;
+  white-space: pre-line; /* Preserves paragraphs and formatting */
+}
+
+.detail-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  padding-top: 20px;
+  margin-top: 20px;
+}
+
+.detail-author {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .detail-title {
+    font-size: 1.4rem;
+  }
+  .detail-body {
+    font-size: 0.95rem;
+  }
+  .detail-image-wrapper {
+    height: 180px;
+  }
+}

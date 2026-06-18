@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- SEO and Meta tags -->
+  <title>Bright Side - Source of Positive News & Optimism</title>
+  <meta name="description" content="A website dedicated exclusively to beautiful and positive things happening in the world. Share joy, humanity, scientific breakthroughs, and inspiring stories.">
+  
+  <!-- Prevents FOUC (Flash of Unstyled Content) -->
+  <meta name="color-scheme" content="light dark">
+  <script>
+    {
+      const savedTheme = localStorage.getItem("color-scheme");
+      if (savedTheme) {
+        document.querySelector('meta[name="color-scheme"]').content = savedTheme;
+        if (savedTheme === 'dark') {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.documentElement.classList.add('dark-mode');
+      }
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Decorative background glow spheres for glassmorphism layout -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  <div class="bg-glow bg-glow-3"></div>
+
+  <!-- MAIN HEADER -->
+  <header class="main-header">
+    <div class="header-container">
+      <a href="#" class="logo-area" id="logo-link">
+        <img src="logo.png" alt="Bright Side Logo" class="app-logo">
+        <div class="brand-text">
+          <h1>Bright Side</h1>
+          <span class="tagline">only good news</span>
+        </div>
+      </a>
+      
+      <div class="header-actions">
+        <!-- Theme Toggle Button -->
+        <button id="theme-toggle" class="icon-btn" aria-label="Toggle theme" title="Toggle theme">
+          <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+        
+        <!-- Open form modal button -->
+        <button id="add-news-btn" class="primary-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="btn-icon">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Share Joy</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+      <div class="hero-text">
+        <h2>The world is full of beauty. <br><span class="gradient-text">Let's notice it together.</span></h2>
+        <p>There is too much negativity in the news and social media. Bright Side is a space to celebrate scientific breakthroughs, environmental triumphs, selfless humanity, and everyday small good deeds that restore our faith in one another.</p>
+        
+        <!-- Stats -->
+        <div class="stats-container">
+          <div class="stat-item">
+            <span class="stat-number" id="stats-smiles">1,248</span>
+            <span class="stat-label">Smiles Shared</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" id="stats-stories">42</span>
+            <span class="stat-label">Good Stories</span>
+          </div>
+        </div>
+
+        <!-- HERO OPTIMISM GENERATOR (Sleek Inline Version) -->
+        <div class="hero-quote-callout">
+          <p id="quote-text">"There is a crack in everything. That's how the light gets in."</p>
+          <div class="hero-quote-callout-footer">
+            <cite id="quote-author">— Leonard Cohen</cite>
+            <button id="new-quote-btn" class="quote-refresh-btn" title="Show another quote" aria-label="Show another quote">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- HERO FEATURED STORIES SLIDER -->
+      <div class="featured-slider-container glass-panel" id="featured-slider">
+        <div class="slider-wrapper">
+          <div class="slide-active-img-wrapper">
+            <img id="featured-img" src="" alt="Featured Story" class="featured-img">
+            <div class="img-overlay"></div>
+          </div>
+          <div class="slider-content">
+            <div class="slider-meta">
+              <span class="badge badge-kindness" id="featured-category">Featured</span>
+              <span class="slide-date" id="featured-date">Date</span>
+            </div>
+            <h3 id="featured-title" class="slide-title">Loading beautiful moments...</h3>
+            <p id="featured-desc" class="slide-desc">Please wait while we prepare some positivity for you.</p>
+            <div class="slider-footer">
+              <button class="primary-btn sm-btn" id="featured-read-btn">Read Full Story</button>
+              <div class="slider-navigation">
+                <button class="nav-arrow" id="featured-prev-btn" aria-label="Previous story">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                </button>
+                <button class="nav-arrow" id="featured-next-btn" aria-label="Next story">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTROLS AND FILTERS -->
+    <section class="controls-section glass-panel">
+      <!-- Search Box -->
+      <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="search-input" placeholder="Search positive news...">
+      </div>
+
+      <!-- Category Filters -->
+      <div class="categories-filter">
+        <button class="filter-btn active" data-category="all">All Stories</button>
+        <button class="filter-btn" data-category="humanity">Humanity</button>
+        <button class="filter-btn" data-category="science">Science & Tech</button>
+        <button class="filter-btn" data-category="nature">Nature & Ecology</button>
+        <button class="filter-btn" data-category="kindness">Kindness & Good Deeds</button>
+        <button class="filter-btn" data-category="culture">Art & Culture</button>
+      </div>
+    </section>
+
+    <!-- NEWS FEED SECTION -->
+    <section class="news-feed-section">
+      <div class="feed-header">
+        <h3 id="feed-title">Latest Good News</h3>
+        <span class="feed-count" id="feed-count">0 stories</span>
+      </div>
+      
+      <!-- News Grid -->
+      <div class="news-grid" id="news-grid">
+        <!-- News cards generated dynamically via JS -->
+      </div>
+      
+      <!-- Empty State Placeholder -->
+      <div class="empty-state hidden" id="empty-state">
+        <div class="empty-icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-icon">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"></path>
+          </svg>
+        </div>
+        <h4>No stories found...</h4>
+        <p>Be the driver of change! Share something positive that happened today.</p>
+        <button id="empty-add-btn" class="primary-btn">Share the first story</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FORM MODAL FOR ADDING NEWS -->
+  <div class="modal-overlay" id="add-news-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-card glass-panel animate-scale">
+      <div class="modal-header">
+        <h3 id="modal-title">Share a Positive Story</h3>
+        <button class="close-btn" id="close-modal-btn" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      
+      <form id="add-news-form" class="modal-form">
+        <!-- Title -->
+        <div class="form-group">
+          <label for="news-title">What good thing happened? <span class="required">*</span></label>
+          <input type="text" id="news-title" required minlength="5" maxlength="100" placeholder="e.g. Scientists find a way to clean plastics from the ocean">
+          <span class="error-msg" id="title-error">Title must be at least 5 characters.</span>
+        </div>
+
+        <!-- Category -->
+        <div class="form-group">
+          <label for="news-category">Category <span class="required">*</span></label>
+          <div class="select-wrapper">
+            <select id="news-category" required>
+              <option value="" disabled selected>Select category</option>
+              <option value="humanity">Humanity</option>
+              <option value="science">Science & Tech</option>
+              <option value="nature">Nature & Ecology</option>
+              <option value="kindness">Kindness & Good Deeds</option>
+              <option value="culture">Art & Culture</option>
+            </select>
+            <svg class="select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="form-group">
+          <label for="news-content">Story Details <span class="required">*</span></label>
+          <textarea id="news-content" required minlength="20" maxlength="1000" rows="5" placeholder="Describe the good news. Who took part, what happened, and why does this story inspire us?"></textarea>
+          <span class="error-msg" id="content-error">Details must be at least 20 characters.</span>
+        </div>
+
+        <div class="form-row">
+          <!-- Author -->
+          <div class="form-group">
+            <label for="news-author">Your Name / Source</label>
+            <input type="text" id="news-author" placeholder="e.g. Mark or Science News">
+          </div>
+          
+          <!-- Link -->
+          <div class="form-group">
+            <label for="news-link">Link to source (optional)</label>
+            <input type="url" id="news-link" placeholder="https://...">
+            <span class="error-msg" id="link-error">Please enter a valid URL.</span>
+          </div>
+        </div>
+
+        <!-- Image Link -->
+        <div class="form-group">
+          <label for="news-image">Image Link (optional URL)</label>
+          <input type="url" id="news-image" placeholder="https://example.com/image.jpg">
+          <span class="error-msg" id="image-error">Please enter a valid image URL.</span>
+        </div>
+
+        <!-- Email submissions info note -->
+        <div class="form-info-note">
+          <p>💡 Have an original story or personal photo to share? Email us at <a href="mailto:submissions@brightside.world">submissions@brightside.world</a> and we'll publish it for you!</p>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="secondary-btn" id="cancel-modal-btn">Cancel</button>
+          <button type="submit" class="primary-btn" id="submit-news-btn">Share with the world</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- STORY DETAIL MODAL -->
+  <div class="modal-overlay" id="story-detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+    <div class="modal-card glass-panel animate-scale detail-modal-card">
+      <div class="modal-header">
+        <span class="badge" id="detail-category">Category</span>
+        <button class="close-btn" id="close-detail-btn" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="detail-content">
+        <div class="detail-image-wrapper">
+          <img src="" alt="" id="detail-image" class="detail-image">
+        </div>
+        <h3 id="detail-title" class="detail-title">Story Title</h3>
+        <span class="detail-date" id="detail-date">Date</span>
+        <div class="detail-body" id="detail-body">
+          <!-- Full content -->
+        </div>
+        <div class="detail-footer">
+          <span class="detail-author" id="detail-author">Shared by: <strong>Author</strong></span>
+          <div class="detail-actions">
+            <button class="like-btn" id="detail-like-btn" aria-label="Upvote story">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+              <span class="likes-count" id="detail-likes-count">0</span>
+            </button>
+            <a href="" target="_blank" rel="noopener noreferrer" class="link-btn" id="detail-link" title="View news source">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="main-footer">
+    <div class="footer-container">
+      <div class="footer-logo">
+        <span class="logo-emoji">☀️</span>
+        <span>Bright Side</span>
+      </div>
+      <p class="footer-copy">&copy; 2026. Start a wave of kindness. Made with love for a better world.</p>
+    </div>
+  </footer>
+
+  <!-- Main script -->
+  <script src="app.js"></script>
+</body>
+</html>
