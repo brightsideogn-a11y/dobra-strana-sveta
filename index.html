@@ -172,6 +172,23 @@
       </div>
     </section>
 
+    <!-- MODERATOR DASHBOARD (Only visible to logged-in admin) -->
+    <section class="moderator-dashboard-section glass-panel hidden" id="admin-dashboard">
+      <div class="dashboard-header">
+        <div class="dashboard-title-area">
+          <h3>Moderator Dashboard</h3>
+          <span class="dashboard-user">Logged in as: <strong id="admin-user-display">brightsideogn@gmail.com</strong></span>
+        </div>
+        <button id="admin-logout-btn" class="secondary-btn sm-btn">Sign Out</button>
+      </div>
+      <div class="dashboard-pending-area">
+        <h4>Pending Stories Verification (<span id="pending-count">0</span>)</h4>
+        <div class="pending-grid" id="pending-grid">
+          <!-- Pending stories rendered dynamically via JS -->
+        </div>
+      </div>
+    </section>
+
     <!-- NEWS FEED SECTION -->
     <section class="news-feed-section">
       <div class="feed-header">
@@ -333,10 +350,43 @@
         <span>Bright Side</span>
       </div>
       <p class="footer-copy">&copy; 2026. Start a wave of kindness. Made with love for a better world.</p>
+      <div class="footer-links" style="margin-top: 10px;">
+        <button id="admin-nav-btn" class="text-btn sm-text" style="font-size: 0.8rem; opacity: 0.7; cursor: pointer; background: none; border: none; color: var(--accent-teal);">Moderator Admin</button>
+      </div>
     </div>
   </footer>
 
-  <!-- Main script -->
-  <script src="app.js"></script>
+  <!-- ADMIN LOGIN MODAL -->
+  <div class="modal-overlay" id="admin-login-modal" role="dialog" aria-modal="true" aria-labelledby="admin-login-title">
+    <div class="modal-card glass-panel animate-scale login-modal-card" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3 id="admin-login-title">Moderator Login</h3>
+        <button class="close-btn" id="close-login-btn" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <form id="admin-login-form" class="modal-form" style="gap: 16px;">
+        <div class="form-group">
+          <label for="admin-email">Email Address</label>
+          <input type="email" id="admin-email" required placeholder="brightsideogn@gmail.com">
+        </div>
+        <div class="form-group">
+          <label for="admin-password">Password</label>
+          <input type="password" id="admin-password" required placeholder="••••••••">
+        </div>
+        <span class="error-msg" id="login-error" style="display: none; color: var(--accent-heart); font-size: 0.85rem;">Invalid email or password.</span>
+        <div class="form-actions" style="margin-top: 8px;">
+          <button type="button" class="secondary-btn" id="cancel-login-btn">Cancel</button>
+          <button type="submit" class="primary-btn">Sign In</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main script (loaded as ES Module) -->
+  <script type="module" src="app.js"></script>
 </body>
 </html>

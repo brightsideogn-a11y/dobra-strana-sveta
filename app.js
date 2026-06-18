@@ -1,6 +1,24 @@
 /* ==========================================================================
-   Bright Side - Application Logic (English Version)
+   Bright Side - Application Logic (English Version - Cloud Firestore)
    ========================================================================== */
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getFirestore, collection, addDoc, query, where, onSnapshot, doc, updateDoc, deleteDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+const firebaseConfig = {
+  projectId: "bright-side-ogn-7e0e7",
+  appId: "1:969138195077:web:fccb5442552408d1c4f7ec",
+  storageBucket: "bright-side-ogn-7e0e7.firebasestorage.app",
+  apiKey: "AIzaSyAAX4MCd9ibSEq3Im-K5G_ukdA7yFFDy6s",
+  authDomain: "bright-side-ogn-7e0e7.firebaseapp.com",
+  messagingSenderId: "969138195077",
+  measurementId: "G-NZG8RC9QJJ"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
 // 1. PRE-SEEDED GOOD NEWS DATASET
 const DEFAULT_STORIES = [
@@ -139,70 +157,7 @@ function setTheme(theme, save = true) {
 
 // 6. DATA LOADER & PERSISTENCE
 async function loadData() {
-  // Load stories from localStorage or seed defaults
-  const savedStories = localStorage.getItem("stories");
-  if (savedStories) {
-    stories = JSON.parse(savedStories);
-    
-    // In case the user had Serbian stories saved, let's reset to English if it contains default Serbian IDs
-    // to keep the language transition seamless
-    if (stories.length > 0 && stories.some(s => s.id === "story-default-1" && s.title.includes("Biorazgradiva"))) {
-      stories = [...DEFAULT_STORIES];
-      localStorage.setItem("stories", JSON.stringify(stories));
-    }
-  } else {
-    stories = [...DEFAULT_STORIES];
-    localStorage.setItem("stories", JSON.stringify(stories));
-  }
-
-  // Try to load stories scraped by the agent
-  try {
-    const response = await fetch('stories.json');
-    if (response.ok) {
-      const scrapedStories = await response.json();
-      if (Array.isArray(scrapedStories)) {
-        // Keep user's custom-created local stories (they don't start with story-default and aren't in scraped stories)
-        const userCustomStories = stories.filter(s => 
-          !s.id.startsWith("story-default") && 
-          !scrapedStories.some(ss => ss.id === s.id)
-        );
-
-        const merged = [];
-        const seenIds = new Set();
-
-        // Add user custom stories first
-        userCustomStories.forEach(s => {
-          if (!seenIds.has(s.id)) {
-            merged.push(s);
-            seenIds.add(s.id);
-          }
-        });
-
-        // Add scraped stories
-        scrapedStories.forEach(s => {
-          if (!seenIds.has(s.id)) {
-            merged.push(s);
-            seenIds.add(s.id);
-          }
-        });
-
-        // Add default stories as fallback
-        DEFAULT_STORIES.forEach(s => {
-          if (!seenIds.has(s.id)) {
-            merged.push(s);
-            seenIds.add(s.id);
-          }
-        });
-
-        stories = merged;
-        localStorage.setItem("stories", JSON.stringify(stories));
-      }
-    }
-  } catch (error) {
-    console.log("No local stories.json found or failed to fetch. Using defaults/localStorage.");
-  }
-
-  // Load liked stories
+  // Load liked stories list from localStorage
   const savedLikes = localStorage.getItem("likedStories");
   if (savedLikes) {
     likedStories = JSON.parse(savedLikes);
@@ -210,10 +165,55 @@ async function loadData() {
     likedStories = [];
     localStorage.setItem("likedStories", JSON.stringify(likedStories));
   }
+
+  // Subscribe to approved stories in Firestore
+  const approvedQuery = query(collection(db, "stories"), where("status", "==", "approved"));
+  onSnapshot(approvedQuery, async (snapshot) => {
+    stories = [];
+    snapshot.forEach(doc => {
+      stories.push({ id: doc.id, ...doc.data() });
+    });
+    
+    // Sort stories: timestamp descending
+    stories.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    
+    // Auto-seed if empty and logged in as admin
+    if (stories.length === 0 && auth.currentUser && auth.currentUser.email === "brightsideogn@gmail.com") {
+      await seedDefaultStories();
+    }
+    
+    // Update view
+    renderStories();
+    initFeaturedSlider(); // Update slider too with latest stories
+    updateStats();
+  }, (error) => {
+    console.error("Approved stories subscription error:", error);
+  });
 }
 
-function saveStories() {
-  localStorage.setItem("stories", JSON.stringify(stories));
+async function seedDefaultStories() {
+  console.log("Database is empty. Seeding default stories...");
+  const colRef = collection(db, "stories");
+  for (let i = 0; i < DEFAULT_STORIES.length; i++) {
+    const story = DEFAULT_STORIES[i];
+    const newStory = {
+      title: story.title,
+      category: story.category,
+      content: story.content,
+      author: story.author,
+      link: story.link || "",
+      image: story.image || "",
+      date: story.date,
+      timestamp: Date.now() - (DEFAULT_STORIES.length - i) * 60000,
+      likes: story.likes,
+      status: "approved"
+    };
+    try {
+      await addDoc(colRef, newStory);
+    } catch (e) {
+      console.error("Error seeding story:", e);
+    }
+  }
 }
 
 function saveLikes() {
@@ -246,15 +246,9 @@ function renderStories() {
   
   emptyState.classList.add("hidden");
 
-  // Sort: Custom newest stories first
+  // Sort: newest first by timestamp or fallback to date
   const sortedStories = [...filteredStories].sort((a, b) => {
-    const aTime = a.id.startsWith("story-default") ? 0 : parseInt(a.id.split("-")[1] || 0);
-    const bTime = b.id.startsWith("story-default") ? 0 : parseInt(b.id.split("-")[1] || 0);
-    
-    if (aTime === 0 && bTime === 0) {
-      return DEFAULT_STORIES.findIndex(s => s.id === a.id) - DEFAULT_STORIES.findIndex(s => s.id === b.id);
-    }
-    return bTime - aTime;
+    return (b.timestamp || 0) - (a.timestamp || 0);
   });
 
   // Render cards
@@ -309,7 +303,7 @@ function renderStories() {
 }
 
 // 8. UPVOTE FUNCTIONALITY
-window.toggleLike = function(storyId) {
+window.toggleLike = async function(storyId) {
   const story = stories.find(s => s.id === storyId);
   if (!story) return;
 
@@ -318,10 +312,12 @@ window.toggleLike = function(storyId) {
   const likeBtn = cardElement ? cardElement.querySelector('.like-btn') : null;
   const likesDisplay = cardElement ? cardElement.querySelector('.likes-count') : null;
 
+  let newLikes = story.likes;
+
   if (likeIndex === -1) {
     // Upvote
     likedStories.push(storyId);
-    story.likes++;
+    newLikes++;
     if (likeBtn) {
       likeBtn.classList.add('liked');
       animateHeart(likeBtn.querySelector('svg'));
@@ -329,17 +325,33 @@ window.toggleLike = function(storyId) {
   } else {
     // Remove upvote
     likedStories.splice(likeIndex, 1);
-    story.likes--;
+    newLikes--;
     if (likeBtn) likeBtn.classList.remove('liked');
   }
 
   if (likesDisplay) {
-    likesDisplay.textContent = story.likes;
+    likesDisplay.textContent = newLikes;
   }
 
-  saveStories();
   saveLikes();
   updateStats();
+
+  try {
+    const storyDocRef = doc(db, "stories", storyId);
+    await updateDoc(storyDocRef, {
+      likes: newLikes
+    });
+  } catch (error) {
+    console.error("Error updating likes in Firestore: ", error);
+    // Rollback locally if it fails
+    if (likeIndex === -1) {
+      likedStories.pop();
+    } else {
+      likedStories.push(storyId);
+    }
+    saveLikes();
+    updateStats();
+  }
 };
 
 function animateHeart(svg) {
@@ -513,7 +525,6 @@ function setupEventListeners() {
         const imageVal = document.getElementById("news-image") ? document.getElementById("news-image").value.trim() : "";
         
         const newStory = {
-          id: `story-${Date.now()}`,
           title: titleVal,
           category: categoryVal,
           content: contentVal,
@@ -521,25 +532,29 @@ function setupEventListeners() {
           link: linkVal,
           image: imageVal,
           date: getCurrentFormattedDate(),
-          likes: 0
+          timestamp: Date.now(),
+          likes: 0,
+          status: "pending"
         };
 
-        stories.push(newStory);
-        saveStories();
-        
-        renderStories();
-        updateStats();
-        closeModal();
-        
-        // Highlight new story animation
-        setTimeout(() => {
-          const firstCard = document.querySelector(".news-grid > article");
-          if (firstCard) {
-            firstCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            firstCard.style.outline = "2px solid var(--accent-teal)";
-            setTimeout(() => { firstCard.style.outline = "none"; }, 1500);
-          }
-        }, 300);
+        const submitBtn = addNewsForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Submitting...";
+
+        addDoc(collection(db, "stories"), newStory)
+          .then(() => {
+            closeModal();
+            alert("Thank you! Your story has been submitted for moderation and will appear once approved.");
+          })
+          .catch((error) => {
+            console.error("Error submitting story: ", error);
+            alert("Error submitting story. Please try again.");
+          })
+          .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+          });
       }
     });
   }
@@ -582,7 +597,193 @@ function setupEventListeners() {
       }
     });
   }
+
+  // --- ADMIN & MODERATOR HANDLERS ---
+  const adminNavBtn = document.getElementById("admin-nav-btn");
+  const adminLoginModal = document.getElementById("admin-login-modal");
+  const closeLoginBtn = document.getElementById("close-login-btn");
+  const cancelLoginBtn = document.getElementById("cancel-login-btn");
+  const adminLoginForm = document.getElementById("admin-login-form");
+  const loginErrorMsg = document.getElementById("login-error");
+  const adminLogoutBtn = document.getElementById("admin-logout-btn");
+
+  const closeLoginModal = () => {
+    if (adminLoginModal) {
+      adminLoginModal.classList.remove("active");
+      document.body.style.overflow = "";
+      if (adminLoginForm) adminLoginForm.reset();
+      if (loginErrorMsg) loginErrorMsg.style.display = "none";
+    }
+  };
+
+  if (adminNavBtn) {
+    adminNavBtn.addEventListener("click", () => {
+      if (auth.currentUser) {
+        const dashboard = document.getElementById("admin-dashboard");
+        if (dashboard) dashboard.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        if (adminLoginModal) {
+          adminLoginModal.classList.add("active");
+          document.body.style.overflow = "hidden";
+          setTimeout(() => {
+            const emailInput = document.getElementById("admin-email");
+            if (emailInput) emailInput.focus();
+          }, 100);
+        }
+      }
+    });
+  }
+
+  if (closeLoginBtn) closeLoginBtn.addEventListener("click", closeLoginModal);
+  if (cancelLoginBtn) cancelLoginBtn.addEventListener("click", closeLoginModal);
+  if (adminLoginModal) {
+    adminLoginModal.addEventListener("click", (e) => {
+      if (e.target === adminLoginModal) closeLoginModal();
+    });
+  }
+
+  if (adminLoginForm) {
+    adminLoginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("admin-email").value.trim();
+      const password = document.getElementById("admin-password").value;
+      
+      const submitBtn = adminLoginForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Signing In...";
+      
+      if (loginErrorMsg) loginErrorMsg.style.display = "none";
+      
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        closeLoginModal();
+      } catch (error) {
+        console.error("Login error:", error);
+        if (loginErrorMsg) {
+          loginErrorMsg.style.display = "block";
+          loginErrorMsg.textContent = "Invalid email or password.";
+        }
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+    });
+  }
+
+  if (adminLogoutBtn) {
+    adminLogoutBtn.addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+      } catch (error) {
+        console.error("Sign out error:", error);
+      }
+    });
+  }
+
+  // Monitor auth state changes
+  onAuthStateChanged(auth, (user) => {
+    const dashboard = document.getElementById("admin-dashboard");
+    const userDisplay = document.getElementById("admin-user-display");
+    
+    if (user) {
+      if (dashboard) dashboard.classList.remove("hidden");
+      if (userDisplay) userDisplay.textContent = user.email;
+      
+      // Listen to pending stories
+      const pendingQuery = query(collection(db, "stories"), where("status", "==", "pending"));
+      window.unsubscribePending = onSnapshot(pendingQuery, (snapshot) => {
+        const pendingStories = [];
+        snapshot.forEach(doc => {
+          pendingStories.push({ id: doc.id, ...doc.data() });
+        });
+        pendingStories.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        renderPendingStories(pendingStories);
+      }, (error) => {
+        console.error("Pending stories subscription error:", error);
+      });
+    } else {
+      if (dashboard) dashboard.classList.add("hidden");
+      if (window.unsubscribePending) {
+        window.unsubscribePending();
+        window.unsubscribePending = null;
+      }
+    }
+  });
 }
+
+// Render and management functions for pending stories
+function renderPendingStories(pendingStories) {
+  const pendingGrid = document.getElementById("pending-grid");
+  const pendingCount = document.getElementById("pending-count");
+
+  if (!pendingGrid || !pendingCount) return;
+
+  pendingCount.textContent = pendingStories.length;
+
+  if (pendingStories.length === 0) {
+    pendingGrid.innerHTML = `
+      <div class="empty-pending-state" style="grid-column: 1/-1; text-align: center; padding: 30px; opacity: 0.7;">
+        <p>No stories waiting for approval. Good job!</p>
+      </div>
+    `;
+    return;
+  }
+
+  pendingGrid.innerHTML = pendingStories.map(story => {
+    const badgeClass = `badge-${story.category}`;
+    const categoryName = getCategoryName(story.category);
+    const imageUrl = story.image || getCategoryPlaceholder(story.category);
+    
+    return `
+      <div class="pending-card glass-panel" data-id="${story.id}" style="padding: 16px; display: flex; flex-direction: column; gap: 12px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+        <div style="display: flex; gap: 12px; align-items: start;">
+          <img src="${imageUrl}" alt="" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+          <div style="flex: 1;">
+            <div style="display: flex; gap: 8px; margin-bottom: 4px; align-items: center; flex-wrap: wrap;">
+              <span class="badge ${badgeClass}">${categoryName}</span>
+              <span style="font-size: 0.8rem; opacity: 0.6;">${story.date}</span>
+            </div>
+            <h5 style="margin: 0 0 6px 0; font-size: 1.05rem; font-weight: 600;">${escapeHTML(story.title)}</h5>
+            <p style="margin: 0; font-size: 0.85rem; opacity: 0.8; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${escapeHTML(story.content)}</p>
+          </div>
+        </div>
+        <div style="font-size: 0.8rem; opacity: 0.7;">
+          Shared by: <strong>${escapeHTML(story.author || 'Anonymous')}</strong>
+          ${story.link ? ` | <a href="${escapeHTML(story.link)}" target="_blank" style="color: var(--accent-teal);">Source Link</a>` : ''}
+        </div>
+        <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: auto;">
+          <button class="secondary-btn sm-btn" onclick="deletePendingStory('${story.id}')" style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); color: #f87171;">Delete</button>
+          <button class="primary-btn sm-btn" onclick="approvePendingStory('${story.id}')">Approve</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+window.approvePendingStory = async function(storyId) {
+  try {
+    const storyDocRef = doc(db, "stories", storyId);
+    await updateDoc(storyDocRef, {
+      status: "approved"
+    });
+  } catch (error) {
+    console.error("Error approving story: ", error);
+    alert("Error approving story. Make sure you are logged in.");
+  }
+};
+
+window.deletePendingStory = async function(storyId) {
+  if (confirm("Are you sure you want to delete this pending story?")) {
+    try {
+      const storyDocRef = doc(db, "stories", storyId);
+      await deleteDoc(storyDocRef);
+    } catch (error) {
+      console.error("Error deleting story: ", error);
+      alert("Error deleting story. Make sure you are logged in.");
+    }
+  }
+};
 
 // 12. SCROLL DRIVEN ANIMATIONS FALLBACK (IntersectionObserver)
 function setupScrollAnimations() {

@@ -8,6 +8,9 @@ import urllib.parse
 import xml.etree.ElementTree as ET
 import email.utils
 from datetime import datetime
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
 
 # CONFIGURATION
 RSS_SOURCES = [
@@ -206,45 +209,72 @@ def process_stories_with_gemini(api_key, raw_stories):
         return []
 
 # Merge new stories with existing stories.json, de-duplicating by link
-def merge_and_save_stories(new_stories):
-    existing_stories = []
-    
-    if os.path.exists(STORIES_FILE):
+def save_stories_to_firestore(new_stories):
+    # Initialize Firebase Admin SDK
+    cred_env = os.environ.get("FIREBASE_SERVICE_ACCOUNT_KEY")
+    if cred_env:
         try:
-            with open(STORIES_FILE, "r", encoding="utf-8") as f:
-                existing_stories = json.load(f)
-            print(f"Loaded {len(existing_stories)} existing scraped stories.")
+            # Check if it's a JSON string
+            cred_json = json.loads(cred_env)
+            cred = credentials.Certificate(cred_json)
         except Exception as e:
-            print(f"Error reading existing stories.json: {e}", file=sys.stderr)
-            
-    # Combine and de-duplicate by link
-    combined = []
-    seen_links = set()
+            # If not valid JSON, treat it as a file path
+            print(f"FIREBASE_SERVICE_ACCOUNT_KEY is not a valid JSON string, trying as file path: {e}")
+            cred = credentials.Certificate(cred_env)
+    else:
+        local_key = "service-account-key.json"
+        if os.path.exists(local_key):
+            cred = credentials.Certificate(local_key)
+        else:
+            print("Error: FIREBASE_SERVICE_ACCOUNT_KEY is not set.")
+            print("Please set the environment variable or create 'service-account-key.json'.")
+            sys.exit(1)
+
+    try:
+        firebase_admin.initialize_app(cred)
+    except ValueError:
+        pass # Already initialized
+
+    db = firestore.client()
     
-    # Put new stories first (since they are newer)
+    added_count = 0
     for s in new_stories:
         link = s.get("link")
-        if link and link not in seen_links:
-            combined.append(s)
-            seen_links.add(link)
+        title = s.get("title")
+        
+        # Check if story already exists in Firestore by link or title
+        exists = False
+        if link:
+            docs = db.collection("stories").where("link", "==", link).limit(1).get()
+            if len(docs) > 0:
+                exists = True
+        else:
+            docs = db.collection("stories").where("title", "==", title).limit(1).get()
+            if len(docs) > 0:
+                exists = True
+                
+        if exists:
+            print(f"Story already exists in Firestore: {title}. Skipping.")
+            continue
             
-    # Add old stories if they aren't duplicate
-    for s in existing_stories:
-        link = s.get("link")
-        if link and link not in seen_links:
-            combined.append(s)
-            seen_links.add(link)
-            
-    # Keep only up to MAX_STORIES
-    final_stories = combined[:MAX_STORIES]
-    
-    # Save back to file
-    try:
-        with open(STORIES_FILE, "w", encoding="utf-8") as f:
-            json.dump(final_stories, f, ensure_ascii=False, indent=2)
-        print(f"Successfully saved {len(final_stories)} stories to {STORIES_FILE}.")
-    except Exception as e:
-        print(f"Error writing to stories.json: {e}", file=sys.stderr)
+        doc_data = {
+            "title": title,
+            "category": s.get("category", "kindness"),
+            "content": s.get("content", ""),
+            "author": s.get("author", "Scraper"),
+            "link": link or "",
+            "image": s.get("image") or "",
+            "date": s.get("date") or datetime.now().strftime("%d %b %Y"),
+            "timestamp": int(datetime.now().timestamp() * 1000),
+            "likes": 0,
+            "status": "approved"
+        }
+        
+        db.collection("stories").add(doc_data)
+        print(f"Successfully added story to Firestore: {title}")
+        added_count += 1
+        
+    print(f"Finished writing to Firestore. Added {added_count} new stories.")
 
 def main():
     # Load API key
@@ -272,13 +302,13 @@ def main():
         print("No articles fetched from RSS. Exiting.")
         sys.exit(0)
         
-    # Limit number of raw articles processed to save tokens/avoid rate limits (e.g. max 20)
+    # Limit number of raw articles processed to save tokens/avoid rate limits (e.g. max 10)
     raw_stories = raw_stories[:10]
 
     # 2. Process with Gemini
     scraped_stories = process_stories_with_gemini(api_key, raw_stories)
     
-    # 3. Merge and Save
+    # 3. Save to Firestore
     if scraped_stories:
         # Match back image URLs to their summarized stories by link
         raw_image_map = {s["link"]: s["image"] for s in raw_stories if s.get("link")}
@@ -289,7 +319,7 @@ def main():
             else:
                 s["image"] = ""
                 
-        merge_and_save_stories(scraped_stories)
+        save_stories_to_firestore(scraped_stories)
         print("Scraper run completed successfully.")
     else:
         print("No new stories added.")

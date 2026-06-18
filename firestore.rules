@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /stories/{storyId} {
+      // Allow read access to anyone for approved stories, or authenticated admin for any stories
+      allow read: if resource == null || resource.data.status == 'approved' || request.auth != null;
+      
+      // Allow create access to anyone, as long as the new story is set to 'pending'
+      allow create: if request.resource.data.status == 'pending';
+      
+      // Allow guest updates strictly to increment/decrement the likes count, or admin updates for anything
+      allow update: if request.auth != null || (
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes']) &&
+        (request.resource.data.likes == resource.data.likes + 1 || request.resource.data.likes == resource.data.likes - 1)
+      );
+      
+      // Allow delete access only to the authenticated admin
+      allow delete: if request.auth != null;
+    }
+  }
+}
