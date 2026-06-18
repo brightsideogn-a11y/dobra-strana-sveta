@@ -7,3 +7,4 @@ stories.json
 node_modules/
 .firebase/
 service-account-key.json
+venv/
