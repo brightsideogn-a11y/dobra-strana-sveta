@@ -20,14 +20,9 @@ RSS_SOURCES = [
   {"name": "The Optimist Daily", "url": "https://www.optimistdaily.com/feed/"},
   {"name": "Reasons to be Cheerful", "url": "https://reasonstobecheerful.world/feed/"},
   {"name": "Yes! Magazine", "url": "https://www.yesmagazine.org/feed/"},
-  {"name": "Good News Shared", "url": "https://goodnewsshared.com/feed/"},
   {"name": "The Guardian - The Upside", "url": "https://www.theguardian.com/world/series/the-upside/rss"},
   {"name": "NASA Breaking News", "url": "https://www.nasa.gov/feed/"},
-  {"name": "Today Show - Good News", "url": "https://www.today.com/news/good-news/rss"},
-  {"name": "Scientific American", "url": "https://www.scientificamerican.com/feed/"},
-  {"name": "Google News - Uplifting", "url": "https://news.google.com/rss/search?q=uplifting+news+OR+good+news+OR+positive+news&hl=en-US&gl=US&ceid=US:en"},
-  {"name": "Tricycle Magazine", "url": "https://tricycle.org/feed/"},
-  {"name": "Daily Motivator", "url": "https://dailymotivator.com/feed/"}
+  {"name": "Google News - Uplifting", "url": "https://news.google.com/rss/search?q=uplifting+news+OR+good+news+OR+positive+news&hl=en-US&gl=US&ceid=US:en"}
 ]
 STORIES_FILE = "stories.json"
 MAX_STORIES = 40
@@ -126,10 +121,7 @@ def fetch_rss_stories(source):
                 if img_match:
                     image_url = img_match.group(1)
                     
-            # 4. Scrape the full article page for og:image fallback
-            if not image_url and link_text:
-                print(f"Scraping cover image from webpage: {link_text}...")
-                image_url = extract_og_image(link_text)
+            # 4. Fallback webpage image scraping is deferred to main() after selection to save time/requests
                 
             stories.append({
                 "raw_title": title_text,
@@ -329,10 +321,14 @@ def main():
         raw_image_map = {s["link"]: s["image"] for s in raw_stories if s.get("link")}
         for s in scraped_stories:
             link = s.get("link")
-            if link and link in raw_image_map:
-                s["image"] = raw_image_map[link]
-            else:
-                s["image"] = ""
+            img_url = raw_image_map.get(link, "")
+            
+            # If no image was found in RSS feed, scrape the webpage now ONLY for this curated story
+            if not img_url and link:
+                print(f"Scraping cover image fallback from webpage: {link}...")
+                img_url = extract_og_image(link)
+                
+            s["image"] = img_url or ""
                 
         save_stories_to_firestore(scraped_stories)
         print("Scraper run completed successfully.")
