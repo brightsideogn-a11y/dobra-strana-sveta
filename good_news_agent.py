@@ -220,15 +220,22 @@ def save_stories_to_firestore(new_stories):
         try:
             # Check if it's a JSON string
             cred_json = json.loads(cred_env)
+            # Ensure newlines in private key are correctly processed
+            if "private_key" in cred_json:
+                cred_json["private_key"] = cred_json["private_key"].replace("\\n", "\n")
             cred = credentials.Certificate(cred_json)
         except Exception as e:
             # If not valid JSON, treat it as a file path
-            print(f"FIREBASE_SERVICE_ACCOUNT_KEY is not a valid JSON string, trying as file path: {e}")
+            print(f"FIREBASE_SERVICE_ACCOUNT_KEY is not a valid JSON string or key structure: {e}")
             cred = credentials.Certificate(cred_env)
     else:
         local_key = "service-account-key.json"
         if os.path.exists(local_key):
-            cred = credentials.Certificate(local_key)
+            with open(local_key, "r", encoding="utf-8") as f:
+                cred_json = json.load(f)
+                if "private_key" in cred_json:
+                    cred_json["private_key"] = cred_json["private_key"].replace("\\n", "\n")
+                cred = credentials.Certificate(cred_json)
         else:
             print("Error: FIREBASE_SERVICE_ACCOUNT_KEY is not set.")
             print("Please set the environment variable or create 'service-account-key.json'.")
