@@ -11,6 +11,7 @@ from datetime import datetime
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
+import random
 
 # CONFIGURATION
 RSS_SOURCES = [
@@ -20,7 +21,13 @@ RSS_SOURCES = [
   {"name": "Reasons to be Cheerful", "url": "https://reasonstobecheerful.world/feed/"},
   {"name": "Yes! Magazine", "url": "https://www.yesmagazine.org/feed/"},
   {"name": "Good News Shared", "url": "https://goodnewsshared.com/feed/"},
-  {"name": "The Guardian - The Upside", "url": "https://www.theguardian.com/world/series/the-upside/rss"}
+  {"name": "The Guardian - The Upside", "url": "https://www.theguardian.com/world/series/the-upside/rss"},
+  {"name": "NASA Breaking News", "url": "https://www.nasa.gov/feed/"},
+  {"name": "Today Show - Good News", "url": "https://www.today.com/news/good-news/rss"},
+  {"name": "Scientific American", "url": "https://www.scientificamerican.com/feed/"},
+  {"name": "Google News - Uplifting", "url": "https://news.google.com/rss/search?q=uplifting+news+OR+good+news+OR+positive+news&hl=en-US&gl=US&ceid=US:en"},
+  {"name": "Tricycle Magazine", "url": "https://tricycle.org/feed/"},
+  {"name": "Daily Motivator", "url": "https://dailymotivator.com/feed/"}
 ]
 STORIES_FILE = "stories.json"
 MAX_STORIES = 40
@@ -307,8 +314,11 @@ def main():
         print("No articles fetched from RSS. Exiting.")
         sys.exit(0)
         
-    # Limit number of raw articles processed to save tokens/avoid rate limits (e.g. max 10)
-    raw_stories = raw_stories[:10]
+    # Shuffle the list to get a random mix of stories from all sources
+    random.shuffle(raw_stories)
+    
+    # Limit number of raw articles processed to save tokens/avoid rate limits (e.g. max 20)
+    raw_stories = raw_stories[:20]
 
     # 2. Process with Gemini
     scraped_stories = process_stories_with_gemini(api_key, raw_stories)
